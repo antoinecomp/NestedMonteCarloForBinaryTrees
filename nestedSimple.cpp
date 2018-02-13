@@ -1,3 +1,5 @@
+#include "Board.h"
+
 double playout (Board * board) {
   Move listeCoups [MaxLegalMoves];
   while (true) {
@@ -22,6 +24,7 @@ Move bestRollout [10] [MaxPlayoutLength];
 
 Board bestBoard;
 
+// What is int n ?
 double nested (Board & board, int n) {
   int nbMoves = 0;
   Move moves [MaxLegalMoves];
@@ -37,6 +40,7 @@ double nested (Board & board, int n) {
     for (int i = 0; i < nbMoves; i++) {
       Board b = board;
       b.play (moves [i]);
+		//what is n ?
       if (n == 1)
 	playout (&b);
       else
@@ -47,6 +51,7 @@ double nested (Board & board, int n) {
 	lengthBestRollout [n] = b.length;
 	for (int k = 0; k < b.length; k++)
 	  bestRollout [n] [k] = b.rollout [k];
+	// what is n ?
 	if (n > 3) {
 	  for (int t = 0; t < n - 1; t++)
 	    fprintf (stderr, "\t");
@@ -69,3 +74,9 @@ double nested (Board & board, int n) {
   return 0.0;
 }
 
+// b.length
+// b.score
+// b.rollout
+// b.legalMoves(moves)
+/// b.play(moves[i])
+/// b.terminal()

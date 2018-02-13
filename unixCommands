@@ -1,0 +1,3 @@
+# In order to remplace board occurences by board in main
+grep -rl 'main.2' NestedMonteCarlo/ | xargs sed -i 's/board/board/g' > newMain
+
