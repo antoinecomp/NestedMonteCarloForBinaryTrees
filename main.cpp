@@ -1,7 +1,8 @@
 #define NULL 0
 #include <vector>
 
-// main2
+// this is program that try to apply the Nested MonteCarlo Algorithm to try to find the best output of a scored binary tree.
+// The binary tree is composed of nodes which have key_values.
 
 struct node
 {
@@ -121,15 +122,15 @@ class Board{
 		Board(btree,node);
 
 		//And he has possible blows
-		legalMoves(node); // where we can go from node
+		legalMoves(moves); // where we can go from node
 
     private:
 		//member variables
 		int length;
 		int score;
 		node; // Where we are at the moment of the board
-		// create move ? Array of the following possibilities : left/right ? Or none if we reached the end
-		vector<*node> moves(2,NULL);
+		// Instnatiation moves ? Array of the following possibilities : left/right ? Or none if we reached the end
+		moves;
 		
 
 };
@@ -148,7 +149,7 @@ Board::Board(btree b, node n){
 	length = NULL; //TO-DO : number of nodes which have leaves BUT how to count them ?
 
 	score = n.key_value; //DONE? : number on the current node FROM node
-	
+	Move move[2];
 	if(n->*left != NULL)
 		moves[0] = n->*left;//DONE? array of the left and right positions from current state 	//node *left; and node *right;
 		moves[1] = n->*right;
@@ -167,6 +168,21 @@ int Board::legalMoves(Move moves){
 	
 };
 
+//it's an array of possible moves. It takes node left and node right from a given node in a Board
+class Move{
+    public:
+        Move();
+        ~Move();
+
+    private:
+		vector<node> moves[2];
+};
+
+Move::Move{
+	
+};
+  
+
 /**/
 double playout (Board * board) {
   Move moves [MaxLegalMoves];
@@ -182,16 +198,7 @@ double playout (Board * board) {
   }
 };
 
-//it's an array of possible moves. It takes node left and node right from a given node in a Board
-class Move{
-    public:
-        Move();
-        ~Move();
 
-    private:
-		vector<node> moves[2] 
-};
-  
 #include <float.h>
 
 double bestScoreNested = -DBL_MAX;
