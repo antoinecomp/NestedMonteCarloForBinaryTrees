@@ -1,5 +1,8 @@
 #define NULL 0
 #include <vector>
+#include <cstdlib>
+
+using namespace std;
 
 // this is program that try to apply the Nested MonteCarlo Algorithm to try to find the best output of a scored binary tree.
 // The binary tree is composed of nodes which have key_values.
@@ -9,6 +12,11 @@ struct node
   int key_value;
   node *left;
   node *right;
+};
+
+//it's an array of possible moves. It takes node left and node right from a given node in a Board
+struct Move{
+		vector<node> moves[2];
 };
 
 class btree
@@ -112,7 +120,9 @@ void btree::destroy_tree()
   destroy_tree(root);
 }
 
-// Displ
+
+
+// Display the current state of a game
 class Board{
 
     public:
@@ -121,17 +131,18 @@ class Board{
 
 		//a Board is made from a binary tree. Furthermore he has a score, a length
 		Board(btree,node);
-
+		Move getLegalMoves(node);
+		//Move moves = getLegalMoves(node);
 		//And he has possible blows
-		legalMoves(moves); // where we can go from node
+		int legalMoves(Move); // where we can go from node
 
     private:
 		//member variables
 		int length;
 		int score;
-		node; // Where we are at the moment of the board
+		node n; // Where we are at the moment of the board
 		// Instnatiation moves ? Array of the following possibilities : left/right ? Or none if we reached the end
-		moves;
+		// Move moves; // error: redeclaration of ‘Move Board::moves’
 		
 
 };
@@ -150,7 +161,7 @@ Board::Board(btree b, node n){
 	length = NULL; //TO-DO : number of nodes which have leaves BUT how to count them ?
 
 	score = n.key_value; //DONE? : number on the current node FROM node
-	Move move[2];
+	Move moves[2];
 	if(n->*left != NULL)
 		moves[0] = n->*left;//DONE? array of the left and right positions from current state 	//node *left; and node *right;
 		moves[1] = n->*right;
@@ -169,36 +180,29 @@ int Board::legalMoves(Move moves){
 	
 };
 
-//it's an array of possible moves. It takes node left and node right from a given node in a Board
-class Move{
-    public:
-        Move();
-        ~Move();
-
-    private:
-		vector<node> moves[2];
-};
-
-Move::Move(){
-	moves= NULL;
+// gives the number of leaves we can play : either 2 or 0 in the binary-tree case.
+Move Board::getLegalMoves(node n){
+	if(n->*left != NULL)
+		moves[0] = n->*left;//DONE? array of the left and right positions from current state 	//node *left; and node *right;
+		moves[1] = n->*right;
 };
 
 
-  
 
 /**/
 double playout (Board * board) {
-  Move moves [MaxLegalMoves];
-  while (true) {
-    int nb = board->legalMoves (moves);
-    if ((nb == 0) || board->terminal ())
-      return board->score ();
-    int n = rand () % nb;
-    board->play (moves [n]);
-    if (board->length >= MaxPlayoutLength - 20) {
-      return 0;
-    }
-  }
+	Move moves [2];
+	//Move moves [MaxLegalMoves];
+	while (true) {
+		int nb = board->legalMoves (moves);
+		if ((nb == 0) || board->terminal ())
+			return board->score ();
+			int n = rand () % nb;
+			board->play (moves [n]);
+		if (board->length >= MaxPlayoutLength - 20) {
+			return 0;
+		}
+	}
 };
 
 
@@ -215,7 +219,8 @@ Board bestBoard;
 // What is int n ?
 double nested (Board & board, int n) {
 	int nbMoves = 0;
-	Move moves [MaxLegalMoves];
+	Move moves [2]; // are we creating an object Move ? Why isn't it Move(...) ?
+	Move moves [MaxLegalMoves]; // are we creating an object Move ? Why isn't it Move(...) ?
 
 	lengthBestRollout [n] = -1;
 	scoreBestRollout [n] = -DBL_MAX;
@@ -226,7 +231,7 @@ double nested (Board & board, int n) {
 			return 0.0;
 			//return board.score();
 		// if there is still things to play
-		nbMoves = board.legalMoves (moves);
+		nbMoves = board.legalMoves(moves); // BUT moves is empty at the beginning ???
 		for (int i = 0; i < nbMoves; i++) {
 			Board b = board;
 			b.play(moves[i]);
