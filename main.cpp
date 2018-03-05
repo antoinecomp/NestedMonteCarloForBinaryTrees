@@ -162,16 +162,16 @@ Board::Board(btree b, node n){
 
 	score = n.key_value; //DONE? : number on the current node FROM node
 	Move moves[2];
-	if(n->*left != NULL)
-		moves[0] = n->*left;//DONE? array of the left and right positions from current state 	//node *left; and node *right;
-		moves[1] = n->*right;
+	if(n.left != NULL)
+		moves[0] = n.left;//DONE? array of the left and right positions from current state 	//node *left; and node *right;
+		moves[1] = n.right;
 	
 }; 
 
 // gives the number of leaves we can play : either 2 or 0 in the binary-tree case.
 int Board::legalMoves(Move moves){
 	//If there is leaves there is at least two moves.
-	if(n->*left != NULL){// wrong we have to take move into account
+	if(n.left != NULL){// wrong we have to take move into account
 		return 2;	
 	}//otherwise there is no possibilities
 	else{
@@ -182,9 +182,9 @@ int Board::legalMoves(Move moves){
 
 // gives the number of leaves we can play : either 2 or 0 in the binary-tree case.
 Move Board::getLegalMoves(node n){
-	if(n->*left != NULL)
-		moves[0] = n->*left;//DONE? array of the left and right positions from current state 	//node *left; and node *right;
-		moves[1] = n->*right;
+	if(n.left != NULL)
+		moves[0] = n.left;//DONE? array of the left and right positions from current state 	//node *left; and node *right;
+		moves[1] = n.right;
 };
 
 
