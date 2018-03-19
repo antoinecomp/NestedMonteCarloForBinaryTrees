@@ -7,6 +7,8 @@ using namespace std;
 // this is program that try to apply the Nested MonteCarlo Algorithm to try to find the best output of a scored binary tree.
 // The binary tree is composed of nodes which have key_values.
 
+int MaxPlayoutLength = 20; // Random ...
+
 struct node
 {
   int key_value;
@@ -16,7 +18,7 @@ struct node
 
 //it's an array of possible moves. It takes node left and node right from a given node in a Board
 struct Move{
-		vector<node> moves[2];
+	vector<node> moves[2];
 };
 
 class btree
@@ -135,11 +137,12 @@ class Board{
 		//Move moves = getLegalMoves(node);
 		//And he has possible blows
 		int legalMoves(Move); // where we can go from node
+		bool terminal();
+		int score();
 
     private:
 		//member variables
 		int length;
-		int score;
 		node n; // Where we are at the moment of the board
 		// Instnatiation moves ? Array of the following possibilities : left/right ? Or none if we reached the end
 		// Move moves; // error: redeclaration of ‘Move Board::moves’
@@ -149,7 +152,6 @@ class Board{
 
 Board::Board(){
 	length = 0;
-	score = 0;
 
 }; 
 
@@ -159,19 +161,17 @@ Board::~Board(){
 
 Board::Board(btree b, node n){
 	length = NULL; //TO-DO : number of nodes which have leaves BUT how to count them ?
-
-	score = n.key_value; //DONE? : number on the current node FROM node
-	Move moves[2];
+	vector<node> moves[2];
 	if(n.left != NULL)
-		moves[0] = n.left;//DONE? array of the left and right positions from current state 	//node *left; and node *right;
-		moves[1] = n.right;
+		moves[0] = *n.left;//DONE? array of the left and right positions from current state 	//node *left; and node *right;
+		moves[1] = *n.right;
 	
 }; 
 
 // gives the number of leaves we can play : either 2 or 0 in the binary-tree case.
 int Board::legalMoves(Move moves){
 	//If there is leaves there is at least two moves.
-	if(n.left != NULL){// wrong we have to take move into account
+	if(moves != NULL){// wrong we have to take move into account
 		return 2;	
 	}//otherwise there is no possibilities
 	else{
@@ -181,10 +181,29 @@ int Board::legalMoves(Move moves){
 };
 
 // gives the number of leaves we can play : either 2 or 0 in the binary-tree case.
+bool Board::terminal(){
+	//If there is leaves there is at least two moves.
+	if(n.left == NULL){// wrong we have to take move into account
+		return 1;	
+	}//otherwise there is no possibilities
+	else{
+		return 0;
+	}
+	
+};
+
+int Board::score(){
+	return n.key_value;
+	
+};
+
+// gives the number of leaves we can play : either 2 or 0 in the binary-tree case.
 Move Board::getLegalMoves(node n){
+	vector<node> moves[2];
 	if(n.left != NULL)
 		moves[0] = n.left;//DONE? array of the left and right positions from current state 	//node *left; and node *right;
 		moves[1] = n.right;
+	return moves
 };
 
 
@@ -197,9 +216,9 @@ double playout (Board * board) {
 		int nb = board->legalMoves (moves);
 		if ((nb == 0) || board->terminal ())
 			return board->score ();
-			int n = rand () % nb;
-			board->play (moves [n]);
-		if (board->length >= MaxPlayoutLength - 20) {
+		int n = rand () % nb;
+		board->play (moves [n]);
+		if (board->length >= MaxPlayoutLength - 20) {// d'ou ca sort d'ou
 			return 0;
 		}
 	}
@@ -238,7 +257,7 @@ double nested (Board & board, int n) {
 		  	if (n == 1)
 				playout (&b);
 		  	else
-				nested (b, n - 1);     
+				nested (b, n - 1);
 				double score = b.score ();
 		    if (score > scoreBestRollout [n]) {
 				scoreBestRollout [n] = score;
@@ -254,7 +273,7 @@ double nested (Board & board, int n) {
 					b.print (stderr);
 					fprintf (stderr, "\n");
 				}
-				if ((n > 1) && (score > bestScoreNested)) {
+				if ((n > 1) && (score > bestScoreNested)){
 					bestScoreNested = score;
 					fprintf (stderr, "best score = %f\n", score);
 					b.print (stderr);
