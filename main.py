@@ -1,3 +1,5 @@
+# Attempt to apply a Nested Monte Carlo Algorithm to binary trees
+
 import numpy as np
 
 MaxPlayoutLength = 20 # what ?
@@ -14,7 +16,7 @@ class Node:
 		    self.parent = parent_node
 
 # Class with the  structure of the tree. 
-# This Tree is not balanced.
+# I'm not sure if this Tree is balanced.
 class Tree:
 	def __init__(self):
 		self.root = None
@@ -26,6 +28,7 @@ class Tree:
 		else:
 		    self._insert(x, self.root)
 
+	# place it at the right palce
 	def _insert(self, x, node):
 		if(x < node.key):
 		    if(node.left == None):
@@ -44,6 +47,7 @@ class Tree:
 		    return None
 		else:
 		    return self._find(x, self.root)
+
 	def _find(self, x, node):
 		if(x == node.key):
 		    return node
@@ -98,8 +102,10 @@ class Tree:
 		        x = self.next(node)
 		        node.key = x.key
 		        x = None
-	
+
+# a tree with a selected node at a given time
 class Board:
+	'''a Board is a tree with a node selected which gives a score'''
 	def __init__(self, btree, node):
 		self.root = node
 
@@ -119,6 +125,8 @@ class Board:
 
 	def terminal(self):
 		if(self.root.left == None):
+			print("board terminal")
+			print(self.root.left)
 			return True
 		else:
 			return False
@@ -150,14 +158,16 @@ DBL_MAX = -9999
 
 arraySize = 10
 
-mm = np.matrix([])
-
 lengthBestRollout = np.zeros(10) # array of size 10
 scoreBestRollout = np.zeros(10) # array of size 10
 
 bestRollout =np.zeros((10,MaxPlayoutLength)) # 2 dimensional array of size 10*MaxPlayoutLength
 
 def nested(board, n):
+	'''Nested Monte Carlo algorithm
+	a general name for a broad class of algorithms that use random sampling to obtain numerical results.
+	It is used to solve statistical problems by simulation.'''
+
 	nbMoves = 0
 	moves = np.zeros(2)
 
@@ -165,7 +175,7 @@ def nested(board, n):
 	scoreBestRollout[n] - DBL_MAX
 	res = -DBL_MAX
 	while(True):
-		# if it's over
+		# if it's over we've reached the bottom of the tree
 		if(board.terminal()):
 			return 0.0
 		nbMoves = board.legalMoves(moves)
