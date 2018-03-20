@@ -1,5 +1,6 @@
 # Attempt to apply a Nested Monte Carlo Algorithm to binary trees
 
+from random import *
 import numpy as np
 
 MaxPlayoutLength = 20 # what ?
@@ -106,27 +107,39 @@ class Tree:
 # a tree with a selected node at a given time
 class Board:
 	'''a Board is a tree with a node selected which gives a score'''
-	def __init__(self, btree, node):
-		self.root = node
+	def __init__(self, btree):
+		self.tree = btree
+		self.root = btree.root
+		self.root.left = btree.root.left
+		self.root.right = btree.root.right
+
+		print("Board initialized")
+		print("root :")
+		print(self.root.key)
+		print("btree.root.left")
+		print(btree.root.left)
+		print("btree.root.right")
+		print(btree.root.right)
 
 		# length = NULL; //TO-DO : number of nodes which have leaves BUT how to count them ?
 
 		moves = np.zeros(2) 
-		if(node.left != None):
-			moves[0] = node.left #/DONE? array of the left and right positions from current state 	//node *left; and node *right;
-			moves[1] = node.right
-			score = node.key
+		if(btree.root.left != None):
+			self.moves[0] = btree.root.left #/DONE? 
+			self.moves[1] = btree.root.right
+			score = btree.root.key
 
 	def legalMoves(self, moves):
-		if(move != None):
+		if(moves.all != None):
 			return 2
+		elif(moves.any != None):
+			return 1
 		else:
 			return 0
 
 	def terminal(self):
-		if(self.root.left == None):
+		if((self.root.left == None) and (self.root.right  == None)):
 			print("board terminal")
-			print(self.root.left)
 			return True
 		else:
 			return False
@@ -136,19 +149,29 @@ class Board:
 
 	def getLegalMoves(self,node):
 		if(node.left != None):
-			moves[0] = node.left
-			moves[1] = node.right
+			self.moves[0] = node.left
+			self.moves[1] = node.right
 			return moves
+
+	def play(self,key):
+		'''chose the next node we dive into, if legal :
+		- node : next node the player wants to dive into
+		'''
+		# no test for the moment, let's see if it can make it
+		node = self.tree.find(key)
+		self.root = node
+		self.root.left = node.left
+		self.root.right = node.right
 
 		# length = NULL; //TO-DO : number of nodes which have leaves BUT how to count them ?
 
 def playout(board):
-	moves[2]
+	moves[2]# shoudln't we get them from the board ?
 	while(True):
-		nb = board.legalMoves(moves)
+		nb = board.legalMoves(self.moves)
 		if((nb == 0) or board.terminal()):
 			return board.score()
-		n = rand() * nb # chose a number between 0 and the number of legal moves
+		n = random.randint(0, nb) # chose a number between 0 and the number of legal moves
 		board.play(moves[n]) # play a random move
 		if(board.length >= MaxPlayoutLength -20):
 			return 0
@@ -178,8 +201,7 @@ def nested(board, n):
 		# if it's over we've reached the bottom of the tree
 		if(board.terminal()):
 			return 0.0
-		nbMoves = board.legalMoves(moves)
-		# otherwise
+		nbMoves = board.legalMoves(moves) # moves is full of 0s here ... what has bestRollout[n][board.length] then ?
 		for i in range(0,nbMoves):
 			b = board
 			b.play(moves[i])
@@ -219,7 +241,7 @@ if __name__ == "__main__":
 	t.insert(14)
 	t.insert(18)
 
-	b = Board(t,Node(5))
+	b = Board(t)
 
 	score = nested(b,3)
 	print("the algorithm score is ",score)
