@@ -112,32 +112,48 @@ class Board:
 		self.root = btree.root
 		self.root.left = btree.root.left
 		self.root.right = btree.root.right
+		self.length = 0 # length = NULL; //TO-DO : number of nodes which have leaves BUT how to count them ?
 
 		print("Board initialized")
 		print("root :")
 		print(self.root.key)
-		print("btree.root.left")
-		print(btree.root.left)
-		print("btree.root.right")
-		print(btree.root.right)
 
-		# length = NULL; //TO-DO : number of nodes which have leaves BUT how to count them ?
+		if(btree.root.left is not None):
+			print("btree.root.left.key")
+			print(btree.root.left.key)
+
+		if(btree.root.right is not None):
+			print("btree.root.right.key")
+			print(btree.root.right.key)
+
+
 
 		moves = np.zeros(2) 
 		if(btree.root.left != None):
-			self.moves[0] = btree.root.left #/DONE? 
+			self.moves[0] = btree.root.left 
 			self.moves[1] = btree.root.right
 			score = btree.root.key
 
 	def legalMoves(self, moves):
-		if(moves.all != None):
-			return 2
-		elif(moves.any != None):
-			return 1
-		else:
-			return 0
+		'''Assign the number of legal moves from root and gives the number of legal Moves'''
+		numberLegal = 0
+
+		# we assign the array of possible moves
+		if(self.root.left is not None):
+			moves[0] = self.root.left.key
+		if(self.root.right is not None):
+			moves[1] = self.root.right.key
+
+		# we get the number of legalMoves
+		for i in range(0,len(moves)):
+			if(moves[i] != 0):
+				numberLegal = numberLegal+1
+
+		# and we give back the number of possible moves and the moves theselves
+		return numberLegal, moves
 
 	def terminal(self):
+		'''Test wether we reached the end of a branch of a tree'''
 		if((self.root.left == None) and (self.root.right  == None)):
 			print("board terminal")
 			return True
@@ -145,13 +161,8 @@ class Board:
 			return False
 
 	def score(self):
-		return node.key
-
-	def getLegalMoves(self,node):
-		if(node.left != None):
-			self.moves[0] = node.left
-			self.moves[1] = node.right
-			return moves
+		'''Gives the value of the root'''
+		return self.root.key
 
 	def play(self,key):
 		'''chose the next node we dive into, if legal :
@@ -159,13 +170,18 @@ class Board:
 		'''
 		# no test for the moment, let's see if it can make it
 		node = self.tree.find(key)
-		self.root = node
-		self.root.left = node.left
-		self.root.right = node.right
+		if(node is not None):
+			self.root = node
+			self.root.left = node.left
+			self.root.right = node.right
+		else:
+			print("Trying to play a key which doesn't belong to the tree")
+			print(key)
 
 		# length = NULL; //TO-DO : number of nodes which have leaves BUT how to count them ?
 
 def playout(board):
+	'''from Tristan Cazenave's algorithm'''
 	moves[2]# shoudln't we get them from the board ?
 	while(True):
 		nb = board.legalMoves(self.moves)
@@ -198,10 +214,10 @@ def nested(board, n):
 	scoreBestRollout[n] - DBL_MAX
 	res = -DBL_MAX
 	while(True):
-		# if it's over we've reached the bottom of the tree
+		# we test wether we reached the bottom of the tree
 		if(board.terminal()):
-			return 0.0
-		nbMoves = board.legalMoves(moves) # moves is full of 0s here ... what has bestRollout[n][board.length] then ?
+			return 0.0 # but why should it be 0.0 ?
+		nbMoves,moves = board.legalMoves(moves) # moves is full of 0s here ... what has bestRollout[n][board.length] then ?
 		for i in range(0,nbMoves):
 			b = board
 			b.play(moves[i])
@@ -227,7 +243,10 @@ def nested(board, n):
 					print("best score = ", score)
 					print("")
 					bestBoard = board
-		board.play(bestRollout[n][board.length])
+		print("nbMoves = ",nbMoves,"so we're going to play", bestRollout[n][board.length])
+		#board.play(bestRollout[n][board.length])
+		#board.play(5)
+		print()
 	return 0.0
 			
 if __name__ == "__main__":
