@@ -1,9 +1,22 @@
 # Attempt to apply a Nested Monte Carlo Algorithm to binary trees
 
-from random import *
+import random
+from random import randint
 import numpy as np
 
 MaxPlayoutLength = 20 # what ?
+
+
+# global variables
+bestScoreNested = -9999
+DBL_MAX = -9999
+
+arraySize = 10
+
+lengthBestRollout = np.zeros(10) # array of size 10
+scoreBestRollout = np.zeros(10) # array of size 10
+
+bestRollout =np.zeros((10,MaxPlayoutLength)) # 2 dimensional array of size 10*MaxPlayoutLength
 
 # Class for construct the nodes of the tree. (Subtrees)
 class Node:
@@ -113,31 +126,27 @@ class Board:
 		self.root.left = btree.root.left
 		self.root.right = btree.root.right
 		self.length = 0 # length = NULL; //TO-DO : number of nodes which have leaves BUT how to count them ?
+		self.rollout = [btree.root.key]# selected nodes
+		self.moves = np.zeros(2)
+		self.scoreBoard = btree.root.key 
 
 		print("Board initialized")
 		print("root :")
-		print(self.root.key)
+		print(self.scoreBoard)
 
 		if(btree.root.left is not None):
-			print("btree.root.left.key")
-			print(btree.root.left.key)
+			self.moves[0] = btree.root.left.key
 
 		if(btree.root.right is not None):
-			print("btree.root.right.key")
-			print(btree.root.right.key)
+			self.moves[1] = btree.root.right.key
 
 
 
-		moves = np.zeros(2) 
-		if(btree.root.left != None):
-			self.moves[0] = btree.root.left 
-			self.moves[1] = btree.root.right
-			score = btree.root.key
 
-	def legalMoves(self, moves):
+	def legalMoves(self):
+		moves = np.zeros(2)# shoudln't we get them from the board ?
 		'''Assign the number of legal moves from root and gives the number of legal Moves'''
 		numberLegal = 0
-
 		# we assign the array of possible moves
 		if(self.root.left is not None):
 			moves[0] = self.root.left.key
@@ -155,7 +164,6 @@ class Board:
 	def terminal(self):
 		'''Test wether we reached the end of a branch of a tree'''
 		if((self.root.left == None) and (self.root.right  == None)):
-			print("board terminal")
 			return True
 		else:
 			return False
@@ -170,62 +178,64 @@ class Board:
 		'''
 		# no test for the moment, let's see if it can make it
 		node = self.tree.find(key)
+		print("key we try to play : ",key)
 		if(node is not None):
+			self.length = self.length +1
+			self.rollout.append(key)
+			print("where we went : ",self.rollout)
 			self.root = node
 			self.root.left = node.left
 			self.root.right = node.right
+			print("BOARD HAS CHANGED")
 		else:
-			print("Trying to play a key which doesn't belong to the tree")
-			print(key)
+			#print("Trying to play a key which doesn't belong to the tree")
+			#print(key)
+			print("")
 
 		# length = NULL; //TO-DO : number of nodes which have leaves BUT how to count them ?
 
 def playout(board):
 	'''from Tristan Cazenave's algorithm'''
-	moves[2]# shoudln't we get them from the board ?
 	while(True):
-		nb = board.legalMoves(self.moves)
+		nb,moves = board.legalMoves()
 		if((nb == 0) or board.terminal()):
 			return board.score()
-		n = random.randint(0, nb) # chose a number between 0 and the number of legal moves
+		n = random.randint(0, nb) # chose a number between 0 and the number of legal move
+		print("play a random move",moves[n])
 		board.play(moves[n]) # play a random move
 		if(board.length >= MaxPlayoutLength -20):
 			return 0
 
-bestScoreNested = -9999
-DBL_MAX = -9999
 
-arraySize = 10
-
-lengthBestRollout = np.zeros(10) # array of size 10
-scoreBestRollout = np.zeros(10) # array of size 10
-
-bestRollout =np.zeros((10,MaxPlayoutLength)) # 2 dimensional array of size 10*MaxPlayoutLength
 
 def nested(board, n):
 	'''Nested Monte Carlo algorithm
 	a general name for a broad class of algorithms that use random sampling to obtain numerical results.
 	It is used to solve statistical problems by simulation.'''
-
+	bestScoreNested = -9999
 	nbMoves = 0
-	moves = np.zeros(2)
-
 	lengthBestRollout[n] -1
-	scoreBestRollout[n] - DBL_MAX
-	res = -DBL_MAX
+	scoreBestRollout[n] -9999
+	res = -9999
 	while(True):
 		# we test wether we reached the bottom of the tree
 		if(board.terminal()):
+			print("***Tentative terminée***")
 			return 0.0 # but why should it be 0.0 ?
-		nbMoves,moves = board.legalMoves(moves) # moves is full of 0s here ... what has bestRollout[n][board.length] then ?
+		# we get the number of moves and moves we can go from the selected nodes
+		nbMoves,moves = board.legalMoves()
+		# ???
 		for i in range(0,nbMoves):
+			moves = list(filter (lambda a: a != 0.0, moves))
+			print("moves : ")
+			print(moves)
 			b = board
 			b.play(moves[i])
 			if(n==1):
 				playout(board)
 			else:
 				nested (board, n-1)
-				score = board.score()
+			score = board.score()
 			if(score > scoreBestRollout [n]):
 				scoreBestRollout [n] = score
 				lengthBestRollout [n] = board.length
@@ -243,8 +253,8 @@ def nested(board, n):
 					print("best score = ", score)
 					print("")
 					bestBoard = board
-		print("nbMoves = ",nbMoves,"so we're going to play", bestRollout[n][board.length])
-		#board.play(bestRollout[n][board.length])
+		# unsure about what the following one does :
+		board.play(bestRollout[n][board.length])
 		#board.play(5)
 		print()
 	return 0.0
@@ -252,18 +262,19 @@ def nested(board, n):
 if __name__ == "__main__":
 	# tests
 	t = Tree()
-	t.insert(5)
-	t.insert(6)
-	t.insert(8)
+	compteur = 0
 	t.insert(10)
 	t.insert(11)
 	t.insert(14)
 	t.insert(18)
+	t.insert(5)
+	t.insert(6)
+	t.insert(8)
 
 	b = Board(t)
 
-	score = nested(b,3)
-	print("the algorithm score is ",score)
+	score = nested(b,2)
+	#print("the algorithm score is ",score)
 
 	# Remember: Find method return the node object. 
 	# To return a number use t.find(nº).key
