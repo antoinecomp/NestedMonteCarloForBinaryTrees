@@ -4,6 +4,8 @@ import random
 from random import randint
 import numpy as np
 
+import time
+
 MaxPlayoutLength = 20 # what ?
 
 
@@ -220,7 +222,7 @@ def nested(board, n):
 	while(True):
 		# we test wether we reached the bottom of the tree
 		if(board.terminal()):
-			print("***Tentative terminée***")
+			print("***Attempt ended***")
 			return 0.0 # but why should it be 0.0 ?
 		# we get the number of moves and moves we can go from the selected nodes
 		nbMoves,moves = board.legalMoves()
@@ -252,6 +254,8 @@ def nested(board, n):
 					bestScoreNested = score
 					print("best score = ", score)
 					print("")
+					if(score==18):
+						return 1
 					bestBoard = board
 		# unsure about what the following one does :
 		board.play(bestRollout[n][board.length])
@@ -263,17 +267,21 @@ if __name__ == "__main__":
 	# tests
 	t = Tree()
 	compteur = 0
-	t.insert(10)
-	t.insert(11)
-	t.insert(14)
-	t.insert(18)
-	t.insert(5)
-	t.insert(6)
-	t.insert(8)
+
+	listNumbers = [10,11,14,5,6,8,18]
+	listNumbers = random.sample(listNumbers,len(listNumbers))
+	for number in listNumbers:
+		t.insert(number)
 
 	b = Board(t)
 
+	t0 = time.time()
 	score = nested(b,2)
+	t1 = time.time()
+
+	total = t1-t0
+
+	print("It took", total,"s")
 	#print("the algorithm score is ",score)
 
 	# Remember: Find method return the node object. 
